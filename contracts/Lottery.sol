@@ -2,7 +2,7 @@ pragma solidity ^0.4.19;
 
 import "github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/ownership/Ownable.sol";
 
-contract Lottery is usingOraclize, Ownable {
+contract Lottery is Ownable {
     
     uint jackpot = 5;
     
