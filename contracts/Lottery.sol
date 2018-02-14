@@ -14,6 +14,7 @@ contract Lottery is usingOraclize, Ownable {
     mapping (address => uint) balances;
     
     function recycle() public {
+        require(this.balance >= 1 ether);
         require(msg.sender != 0x0);
         require(potSize < jackpot);
         
