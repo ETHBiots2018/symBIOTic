@@ -6,23 +6,12 @@
     android:layout_height="match_parent"
     tools:context="com.example.andrei.symbiotic.MainActivity">
 
-    <TextView
-        android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="376dp"
-        android:text="Logo here"
-        android:textSize="23dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
 
     <Button
         android:id="@+id/button_register"
         android:layout_width="180dp"
         android:layout_height="74dp"
-        android:layout_marginBottom="148dp"
+        android:layout_marginBottom="112dp"
         android:background="@color/colorPrimaryDark"
         android:text="Register"
         android:textColor="#ffffff"
@@ -38,12 +27,23 @@
         android:id="@+id/button_login"
         android:layout_width="180dp"
         android:layout_height="74dp"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="24dp"
         android:background="@color/colorPrimary"
         android:text="Log in"
         android:textColor="#ffffff"
         android:textSize="20sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/main_image"
+        android:layout_width="180dp"
+        android:layout_height="270dp"
+        android:layout_marginBottom="240dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
