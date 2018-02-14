@@ -1,9 +1,16 @@
 pragma solidity ^0.4.19;
 
-import "github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/ownership/Ownable.sol";
+import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
+import "github.com/OpenZeppelin/zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract Lottery is Ownable {
+contract Lottery is usingOraclize, Ownable {
     
+    enum State {
+        Recycling,
+        PickingWinner
+    }
+    
+    State state = State.Recycling;
     uint jackpot = 5;
     
     uint potSize = 0;
@@ -12,7 +19,16 @@ contract Lottery is Ownable {
     mapping (uint => address) participants;
     mapping (address => uint) balances;
     
-    function recycle() public {
+    modifier inState(State _state) {
+        require(state == _state);
+        _;
+    }
+    
+    function Lottery() public {
+        oraclize_setProof(proofType_Ledger);
+    }
+    
+    function recycle() public inState(State.Recycling) {
         require(this.balance >= 1 ether);
         require(msg.sender != 0x0);
         require(potSize < jackpot);
@@ -24,21 +40,51 @@ contract Lottery is Ownable {
         potSize++;
         
         if (potSize == jackpot) {
-            address winner = pickWinner();
-            winner.transfer(1 ether);
-            resetLottery();
+            state = State.PickingWinner;
+            pickWinner();
         }
     }
     
-    function pickWinner() private view returns (address) {
+    function pickWinner() private {
+        uint N = 7;
+        uint delay = 0;
+        uint callbackGas = 200000;
+        /* bytes32 queryId = */ oraclize_newRandomDSQuery(delay, N, callbackGas);
+    }
+    
+    function __callback(bytes32 _queryId, string _result, bytes _proof) public {
+        if (msg.sender != oraclize_cbAddress()) throw;
+        
+        uint winningNumber;
+        
+        if (oraclize_randomDS_proofVerify__returnCode(_queryId, _result, _proof) != 0) {
+            // The proof verification has failed, we have to use a fallback 
+            // to pick a winning number
+            winningNumber = uint(block.blockhash(block.number - 1)) % potSize;
+        } else {
+            // The proof verification has passed
+            
+            uint maxRange = 2**(8 * 7);
+            uint randomNumber = uint(sha3(_result)) % maxRange;
+            
+            winningNumber = randomNumber % potSize;
+        }
+        
+        address winner = 0x0;
         uint sum = 0;
-        uint winningNumber = uint(block.blockhash(block.number - 1)) % potSize;
         for (uint i = 0; i < nOfParticipants; i++) {
             sum += balances[participants[i]];
             if (sum >= winningNumber) { // We have a winner
-                return participants[i];
+                winner = participants[i];
             }
         }
+        
+        if (winner != 0x0) {
+            winner.transfer(1 ether);
+        }
+        
+        resetLottery();
+        state = State.Recycling;
     }
     
     function resetLottery() private {
@@ -54,7 +100,7 @@ contract Lottery is Ownable {
         return balances[msg.sender];
     }
     
-    function setJackpot(uint _value) public onlyOwner {
+    function setJackpot(uint _value) public onlyOwner inState(State.Recycling) {
         jackpot = _value;
     }
     
