@@ -28,6 +28,10 @@ public class Main {
 
         //initialise web3j
         Web3j web3 = Web3j.build(new InfuraHttpService("https://ropsten.infura.io/yjAnYyZgUECNLVLUPpGK"));
+
+        //Android
+        //Web3j web3 = Web3jFactory.build(new InfuraHttpService("https://ropsten.infura.io/yjAnYyZgUECNLVLUPpGK"));
+
         Web3ClientVersion web3ClientVersion = null;
         try {
             web3ClientVersion = web3.web3ClientVersion().send();
