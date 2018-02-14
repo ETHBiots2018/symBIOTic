@@ -1,0 +1,6 @@
+web3j solidity generate contracts/token.bin contracts/token.abi -o src/ -p eth.biots
+
+solc contracts/token.sol --bin --abi --optimize -o contracts/
+
+web3j wallet create
+
