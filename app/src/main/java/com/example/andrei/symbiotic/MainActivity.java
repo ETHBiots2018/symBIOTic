@@ -7,10 +7,12 @@ import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.support.annotation.RequiresApi;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -45,25 +47,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final ImageView image = findViewById(R.id.main_image);
+        image.setBackgroundResource(R.drawable.logo);
+
+
         /* Buttons */
 
         final Button registerButton = findViewById(R.id.button_register);
         final Button loginButton = findViewById(R.id.button_login);
-
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Toast.makeText(getApplicationContext(), "Register", Toast.LENGTH_SHORT).show();
-
-                /* TODO REGISTER */
-
-            }
-        });
-
-
-
-
 
         /* END Buttons */
 
@@ -71,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
         /* Fingerprint */
         final FingerprintHandler fph;
         fph = new FingerprintHandler(getApplicationContext());
+
+        final FingerprintHandlerRegister fphRegister;
+        fphRegister = new FingerprintHandlerRegister(getApplicationContext());
 
         if (checkFinger()) {
             // We are ready to set up the cipher and the key
@@ -91,19 +85,20 @@ public class MainActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /* TODO AUTHENTICATION */
-
-
+                image.setBackgroundResource(R.drawable.finger);
                 fph.doAuth(fingerprintManager, cryptoObject);
-
-
-//                Intent intent = new Intent(getApplicationContext(), Home.class);
-//                String userId = "id";
-//                intent.putExtra("id", userId);
-//                startActivity(intent);
-
             }
         });
+
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                image.setBackgroundResource(R.drawable.finger);
+                fphRegister.doAuth(fingerprintManager, cryptoObject);
+            }
+        });
+
     }
 
 
@@ -117,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
         // Fingerprint Manager
         fingerprintManager = (FingerprintManager)
                 getSystemService(FINGERPRINT_SERVICE);
+
+        FingerprintManagerCompat fingerprintManagerCompat = FingerprintManagerCompat.from(getApplicationContext());
+
 
         try {
             // Check if the fingerprint sensor is present
