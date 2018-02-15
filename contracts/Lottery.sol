@@ -1,7 +1,7 @@
 pragma solidity ^0.4.19;
 
-import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
-import "github.com/OpenZeppelin/zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "oraclizeAPI_0.4.sol";
+import "Ownable.sol";
 
 /**
  * @title Lottery
@@ -101,7 +101,7 @@ contract Lottery is usingOraclize, Ownable {
     }
   }
 
-  function didIWin(address _sender) public returns (bool) {
+  function didIWin(address _sender) public view returns (bool) {
     return keccak256(_sender) == keccak256(mostRecentWinner);
   }
 
