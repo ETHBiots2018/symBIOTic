@@ -23,8 +23,19 @@ public class Main {
     public static void main(String[] args) {
 	// write your code here
         String address = "0x5ba28f28aa3113df222858ad69f9b618f2b5bcf0";
+
+        SmartContract lottery = new SmartContract();
+
+        System.out.println(lottery.checkLottery(address));
+        System.out.println(lottery.getBalance(address));
+        lottery.recycle(address);
+        System.out.println(lottery.getBalance(address));
+    }
+
+    public void test(){
         String password = "12345678";
         String wallet = "./wallet.json";
+        String address = "0x5ba28f28aa3113df222858ad69f9b618f2b5bcf0";
 
         //initialise web3j
         Web3j web3 = Web3j.build(new InfuraHttpService("https://ropsten.infura.io/yjAnYyZgUECNLVLUPpGK"));
@@ -104,6 +115,5 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }
