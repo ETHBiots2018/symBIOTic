@@ -20,6 +20,8 @@ contract Lottery is usingOraclize, Ownable {
   uint potSize = 0;               // Keeps track of the current pot size
   uint nOfParticipants = 0;       // Keeps track of the number of participant
 
+  address mostRecentWinner = 0x0; // Stores the most recent winner
+
   mapping (uint => address) participants;
   mapping (address => uint) balances;
 
@@ -32,13 +34,13 @@ contract Lottery is usingOraclize, Ownable {
     oraclize_setProof(proofType_Ledger);
   }
 
-  function recycle() public inState(State.Recycling) {
+  function recycle(address _sender) public inState(State.Recycling) {
     require(this.balance >= 1 ether);
-    require(msg.sender != 0x0);
+    require(_sender != 0x0);
     require(potSize < jackpot);
     
-    createParticipantIfNeeded(msg.sender);
-    balances[msg.sender]++;
+    createParticipantIfNeeded(_sender);
+    balances[_sender]++;
     potSize++;
     
     if (potSize == jackpot) {
@@ -80,21 +82,24 @@ contract Lottery is usingOraclize, Ownable {
       winningNumber = randomNumber % potSize;
     }
     
-    address winner = 0x0;
     uint sum = 0;
     for (uint i = 0; i < nOfParticipants; i++) {
       sum += balances[participants[i]];
       if (sum >= winningNumber) { // We have a winner
-          winner = participants[i];
+          mostRecentWinner = participants[i];
       }
     }
 
     resetLottery();
     state = State.Recycling;
 
-    if (winner != 0x0) {
-      winner.transfer(1 ether);
+    if (mostRecentWinner != 0x0) {
+      mostRecentWinner.transfer(1 ether);
     }
+  }
+
+  function didIWin(address _sender) public returns (bool) {
+    return keccak256(_sender) == keccak256(mostRecentWinner);
   }
 
   function resetLottery() private {
@@ -113,8 +118,8 @@ contract Lottery is usingOraclize, Ownable {
     balances[_to] += _amount;
   }
 
-  function getBalance() public view returns (uint) {
-    return balances[msg.sender];
+  function getBalance(address _sender) public view returns (uint) {
+    return balances[_sender];
   }
 
   function setJackpot(uint _value) public onlyOwner inState(State.Recycling) {
