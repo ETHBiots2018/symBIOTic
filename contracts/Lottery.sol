@@ -24,6 +24,8 @@ contract Lottery is usingOraclize, Ownable {
 
   mapping (uint => address) participants;
   mapping (address => uint) balances;
+  
+  event WinnerPicked(address winner);
 
   modifier inState(State _state) {
     require(state == _state);
@@ -94,6 +96,7 @@ contract Lottery is usingOraclize, Ownable {
     state = State.Recycling;
 
     if (mostRecentWinner != 0x0) {
+      WinnerPicked(mostRecentWinner);
       mostRecentWinner.transfer(1 ether);
     }
   }
