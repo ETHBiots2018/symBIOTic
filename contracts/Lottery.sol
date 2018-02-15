@@ -1,7 +1,7 @@
 pragma solidity ^0.4.19;
 
-import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
-import "github.com/OpenZeppelin/zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "oraclizeAPI_0.4.sol";
+import "Ownable.sol";
 
 /**
  * @title Lottery
