@@ -2,6 +2,7 @@ package com.example.andrei.symbiotic;
 
 import android.app.KeyguardManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
@@ -57,6 +58,14 @@ public class MainActivity extends AppCompatActivity {
         final Button loginButton = findViewById(R.id.button_login);
 
         /* END Buttons */
+
+
+        /* Shared pref - use this only once */
+        SharedPreferences.Editor editor = getSharedPreferences("users", MODE_PRIVATE).edit();
+        editor.putString("0", "0x5ba28f28aa3113df222858ad69f9b618f2b5bcf0");
+        editor.putString("1", "0x5ba28f28aa3113df222858ad69f9b618f2b5bcf0");
+        editor.apply();
+
 
 
         /* Fingerprint */

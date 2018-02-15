@@ -82,7 +82,7 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
             @Override
             public void run() {
                 Intent intent = new Intent(c, Home.class);
-                String userId = "id";
+                String userId = "1";
                 intent.putExtra("id", userId);
                 c.startActivity(intent);
             }
@@ -149,7 +149,7 @@ class FingerprintHandlerRegister extends FingerprintManager.AuthenticationCallba
             @Override
             public void run() {
                 Intent intent = new Intent(c, Home.class);
-                String userId = "id";
+                String userId = "0";
                 intent.putExtra("id", userId);
                 c.startActivity(intent);
             }

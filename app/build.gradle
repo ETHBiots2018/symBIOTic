@@ -16,8 +16,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    defaultConfig{
+        multiDexEnabled true
+    }
 
     useLibrary 'org.apache.http.legacy'
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 dependencies {
@@ -28,4 +35,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     compile 'com.microsoft.projectoxford:vision:1.0.394'
+//    compile 'org.web3j:core:3.1.1-android'
+//    compile 'org.web3j:infura:3.1.1-android'
+    compile 'org.web3j:core:3.2.0'
+    compile 'org.web3j:infura:3.1.0'
 }

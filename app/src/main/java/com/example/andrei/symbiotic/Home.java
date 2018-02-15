@@ -1,16 +1,20 @@
 package com.example.andrei.symbiotic;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -20,7 +24,18 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -46,6 +61,10 @@ public class Home extends AppCompatActivity {
     public static final String uriBase = "https://westeurope.api.cognitive.microsoft.com/vision/v1.0/analyze";
     public static final String aux = "visualFeatures=Description&language=en";
 
+    public String ip = "";
+    public int port = 4444;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,11 +73,62 @@ public class Home extends AppCompatActivity {
         Intent intent = getIntent();
 
         String userId = intent.getStringExtra("id");
-        /*
-        * TODO
-        * GET THE BALANCE
-        * Did I win?
-        */
+
+        SharedPreferences prefs = getSharedPreferences("users", MODE_PRIVATE);
+        final String address = prefs.getString(userId, "0");//"No name defined" is the default value.
+
+
+        new Thread(new Runnable() {
+            public void run() {
+
+                Socket clientSocket = null;
+                try {
+                    clientSocket = new Socket(ip, port);
+
+                    DataOutputStream dOut = new DataOutputStream(clientSocket.getOutputStream());
+                    DataInputStream dIn = new DataInputStream(clientSocket.getInputStream());
+
+                    /* get balance */
+                    dOut.writeInt(1);
+                    dOut.flush();
+                    int balance = dIn.readInt();
+
+
+                     /* get lottery */
+                    dOut.writeInt(2);
+                    dOut.flush();
+                    boolean lottery = dIn.readBoolean();
+
+
+                     /* update balance */
+//                    dOut.writeInt(3);
+//                    dOut.flush();
+//
+//                    dOut.close();
+//                    dIn.close();
+//                    clientSocket.close();
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                }
+
+//                SmartContract lottery = new SmartContract();
+//                Toast.makeText(getApplicationContext(), "YAY", Toast.LENGTH_LONG).show();
+//                int balance = lottery.getBalance(address);
+//                boolean win = lottery.checkLottery(address);
+
+
+            }
+        }).start();
+
+
+//        ((TextView)findViewById(R.id.textView)).setText(balance);
+//        Toast.makeText(getApplicationContext(), win?"true":"false", Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(), balance, Toast.LENGTH_LONG).show();
+
+        ///////////////////////////////////////////////////
 
         this.keywords = new ArrayList<>();
         this.keywords.addAll(Arrays.asList("cup", "glass", "water", "bottle"));
@@ -104,6 +174,57 @@ public class Home extends AppCompatActivity {
         });
 
         /* END Buttons */
+    }
+
+    public void thisIsTheServerJustTakeItPlease(){
+
+        int port = 4444; // TODO
+        String ip = "bla"; // TODO - which one???
+
+
+        ServerSocket serverSocket = null;
+
+        try {
+            serverSocket = new ServerSocket(port);
+
+            while (true) {
+                // client:
+                try {
+                    Socket socket = serverSocket.accept();
+
+                    DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+                    DataInputStream dIn = new DataInputStream(socket.getInputStream());
+                    boolean clientConnected = true;
+                    while (clientConnected) {
+                        int type = dIn.readInt();
+                        switch (type) {
+                            case 1: // balance
+                                int balance = 0; // TODO Balance
+                                dOut.writeInt(balance);
+                                dOut.flush();
+                                break;
+                            case 2: // lottery
+                                boolean lottery = false; // TODO Lottery
+                                dOut.writeBoolean(lottery);
+                                dOut.flush();
+                                break;
+                            case 3: // update
+                                // TODO Update balance
+                                break;
+                            default:
+                                dOut.close();
+                                dIn.close();
+                                clientConnected = false;
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -168,6 +289,7 @@ public class Home extends AppCompatActivity {
 
                     this.runOnUiThread(new Runnable() {
                         public void run() {
+
                             findViewById(R.id.camera_preview).setVisibility(View.INVISIBLE);
                             findViewById(R.id.balance).setVisibility(View.VISIBLE);
                             findViewById(R.id.textView).setVisibility(View.VISIBLE);
