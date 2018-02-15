@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">symBIOTic</string>
+    <string name="subscription_key">***REMOVED***</string>
+    <string name="subscription_apiroot">https://westeurope.api.cognitive.microsoft.com/vision/v1.0/analyze</string>
 </resources>

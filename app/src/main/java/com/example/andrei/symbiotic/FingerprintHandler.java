@@ -25,7 +25,9 @@ import android.content.Intent;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.CancellationSignal;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,10 +48,11 @@ import java.security.SignatureException;
 public class FingerprintHandler extends FingerprintManager.AuthenticationCallback {
 
     private Context c;
+    private ImageView image;
 
-    public FingerprintHandler(Context c) {
+    public FingerprintHandler(Context c, ImageView image) {
         this.c = c;
-
+        this.image = image;
 
     }
 
@@ -73,12 +76,19 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
 
 
         Toast.makeText(c, "Authenticated!", Toast.LENGTH_SHORT).show();
+        image.setBackgroundResource(R.drawable.finger_green);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(c, Home.class);
+                String userId = "id";
+                intent.putExtra("id", userId);
+                c.startActivity(intent);
+            }
+        }, 1000);
 
 
-        Intent intent = new Intent(c, Home.class);
-        String userId = "id";
-        intent.putExtra("id", userId);
-        c.startActivity(intent);
 
     }
 
@@ -86,13 +96,13 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     public void onAuthenticationFailed() {
         super.onAuthenticationFailed();
 
-        Toast.makeText(c, "Auth Failed!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(c, "Authentication Failed!", Toast.LENGTH_SHORT).show();
+        image.setBackgroundResource(R.drawable.finger_red);
     }
 
     public void doAuth(FingerprintManager manager, FingerprintManager.CryptoObject obj) {
 
         CancellationSignal signal = new CancellationSignal();
-
         Toast.makeText(c, "Scan your finger!", Toast.LENGTH_SHORT).show();
 
         try {
@@ -108,8 +118,12 @@ class FingerprintHandlerRegister extends FingerprintManager.AuthenticationCallba
 
     private Context c;
 
-    public FingerprintHandlerRegister(Context c) {
+    private ImageView image;
+
+    public FingerprintHandlerRegister(Context c, ImageView image) {
         this.c = c;
+        this.image = image;
+
     }
 
     @Override
@@ -129,11 +143,17 @@ class FingerprintHandlerRegister extends FingerprintManager.AuthenticationCallba
         super.onAuthenticationSucceeded(result);
 
         Toast.makeText(c, "User Registered!", Toast.LENGTH_SHORT).show();
+        image.setBackgroundResource(R.drawable.finger_green);
 
-        Intent intent = new Intent(c, Home.class);
-        String userId = "id";
-        intent.putExtra("id", userId);
-        c.startActivity(intent);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(c, Home.class);
+                String userId = "id";
+                intent.putExtra("id", userId);
+                c.startActivity(intent);
+            }
+        }, 1000);
 
     }
 
