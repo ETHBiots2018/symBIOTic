@@ -101,7 +101,7 @@ contract Lottery is usingOraclize, Ownable {
     }
   }
 
-  function didIWin(address _sender) public returns (bool) {
+  function didIWin(address _sender) public view returns (bool) {
     return keccak256(_sender) == keccak256(mostRecentWinner);
   }
 
