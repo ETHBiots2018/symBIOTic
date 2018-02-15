@@ -61,10 +61,10 @@ public class MainActivity extends AppCompatActivity {
 
         /* Fingerprint */
         final FingerprintHandler fph;
-        fph = new FingerprintHandler(getApplicationContext());
+        fph = new FingerprintHandler(getApplicationContext(), image);
 
         final FingerprintHandlerRegister fphRegister;
-        fphRegister = new FingerprintHandlerRegister(getApplicationContext());
+        fphRegister = new FingerprintHandlerRegister(getApplicationContext(), image);
 
         if (checkFinger()) {
             // We are ready to set up the cipher and the key
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                image.setBackgroundResource(R.drawable.finger);
+                image.setBackgroundResource(R.drawable.finger_grey);
                 fph.doAuth(fingerprintManager, cryptoObject);
             }
         });
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                image.setBackgroundResource(R.drawable.finger);
+                image.setBackgroundResource(R.drawable.finger_grey);
                 fphRegister.doAuth(fingerprintManager, cryptoObject);
             }
         });
