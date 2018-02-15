@@ -37,9 +37,7 @@ contract Lottery is usingOraclize, Ownable {
     require(msg.sender != 0x0);
     require(potSize < jackpot);
     
-    if (balances[msg.sender] == 0) { // It is a new participant
-      participants[nOfParticipants++] = msg.sender;
-    }
+    createParticipantIfNeeded(msg.sender);
     balances[msg.sender]++;
     potSize++;
     
@@ -49,11 +47,17 @@ contract Lottery is usingOraclize, Ownable {
     }
   }
 
+  function createParticipantIfNeeded(address participant) private {
+    if (balances[participant] == 0) {
+      participants[nOfParticipants++] = participant;
+    }
+  }
+
   function pickWinner() private {
-    uint N = 7;
+    uint n = 7;
     uint delay = 0;
     uint callbackGas = 200000;
-    /* bytes32 queryId = */ oraclize_newRandomDSQuery(delay, N, callbackGas);
+    oraclize_newRandomDSQuery(delay, n, callbackGas); // ask the oracle for a random number
   }
 
   function __callback(bytes32 _queryId, string _result, bytes _proof) public {
@@ -70,7 +74,7 @@ contract Lottery is usingOraclize, Ownable {
     } else {
       // The proof verification has passed
       
-      uint maxRange = 2**(8 * 7);
+      uint maxRange = 2**(8 * 7); // do some magic stuff
       uint randomNumber = uint(sha3(_result)) % maxRange;
       
       winningNumber = randomNumber % potSize;
@@ -84,13 +88,13 @@ contract Lottery is usingOraclize, Ownable {
           winner = participants[i];
       }
     }
-    
+
+    resetLottery();
+    state = State.Recycling;
+
     if (winner != 0x0) {
       winner.transfer(1 ether);
     }
-    
-    resetLottery();
-    state = State.Recycling;
   }
 
   function resetLottery() private {
@@ -100,6 +104,13 @@ contract Lottery is usingOraclize, Ownable {
     }
     potSize = 0;
     nOfParticipants = 0;
+  }
+
+  function transfer(address _to, uint _amount) public { 
+    require(balances[msg.sender] >= _amount);  
+    balances[msg.sender] -= _amount;
+    createParticipantIfNeeded(_to);
+    balances[_to] += _amount;
   }
 
   function getBalance() public view returns (uint) {
