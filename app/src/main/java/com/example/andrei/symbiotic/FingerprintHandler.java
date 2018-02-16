@@ -86,7 +86,7 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
                 intent.putExtra("id", userId);
                 c.startActivity(intent);
             }
-        }, 1000);
+        }, 500);
 
 
 
@@ -145,15 +145,15 @@ class FingerprintHandlerRegister extends FingerprintManager.AuthenticationCallba
         Toast.makeText(c, "User Registered!", Toast.LENGTH_SHORT).show();
         image.setBackgroundResource(R.drawable.finger_green);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(c, Home.class);
-                String userId = "0";
-                intent.putExtra("id", userId);
-                c.startActivity(intent);
-            }
-        }, 1000);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                Intent intent = new Intent(c, Home.class);
+//                String userId = "0";
+//                intent.putExtra("id", userId);
+//                c.startActivity(intent);
+//            }
+//        }, 500);
 
     }
 
