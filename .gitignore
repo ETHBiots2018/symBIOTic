@@ -3,6 +3,7 @@
 *.ap_
 *.jar
 *.tar
+graddle
 
 # Files for the ART/Dalvik VM
 *.dex
