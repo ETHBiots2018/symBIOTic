@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -61,14 +62,21 @@ public class Home extends AppCompatActivity {
     public static final String uriBase = "https://westeurope.api.cognitive.microsoft.com/vision/v1.0/analyze";
     public static final String aux = "visualFeatures=Description&language=en";
 
-    public String ip = "";
+    public String ip = "52.232.67.82";
     public int port = 4444;
+
+    private Socket clientSocket = null;
+    DataOutputStream dOut;
+    DataInputStream dIn;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        findViewById(R.id.win).setVisibility(View.INVISIBLE);
+        findViewById(R.id.nowin).setVisibility(View.INVISIBLE);
 
         Intent intent = getIntent();
 
@@ -78,57 +86,61 @@ public class Home extends AppCompatActivity {
         final String address = prefs.getString(userId, "0");//"No name defined" is the default value.
 
 
+        TextView balanceView = (TextView) findViewById(R.id.textView);
+
+
         new Thread(new Runnable() {
             public void run() {
 
-                Socket clientSocket = null;
+
                 try {
                     clientSocket = new Socket(ip, port);
 
-                    DataOutputStream dOut = new DataOutputStream(clientSocket.getOutputStream());
-                    DataInputStream dIn = new DataInputStream(clientSocket.getInputStream());
+                    dOut = new DataOutputStream(clientSocket.getOutputStream());
+                    dIn = new DataInputStream(clientSocket.getInputStream());
 
                     /* get balance */
                     dOut.writeInt(1);
                     dOut.flush();
-                    int balance = dIn.readInt();
+                    final int balance = dIn.readInt();
 
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            TextView balanceView = (TextView) findViewById(R.id.textView);
+                            balanceView.setText(String.valueOf(balance));
+                        }
+                    });
 
                      /* get lottery */
                     dOut.writeInt(2);
                     dOut.flush();
-                    boolean lottery = dIn.readBoolean();
+                    final boolean lottery = dIn.readBoolean();
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            if (lottery) {
+                                findViewById(R.id.win).setVisibility(View.VISIBLE);
+                                findViewById(R.id.nowin).setVisibility(View.INVISIBLE);
+                            } else {
+                                findViewById(R.id.win).setVisibility(View.INVISIBLE);
+                                findViewById(R.id.nowin).setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
+
 
 
                      /* update balance */
-//                    dOut.writeInt(3);
-//                    dOut.flush();
-//
-//                    dOut.close();
-//                    dIn.close();
-//                    clientSocket.close();
-
+                    dOut.writeInt(3);
+                    dOut.flush();
 
                 } catch (IOException e) {
                     e.printStackTrace();
 
                 }
-
-//                SmartContract lottery = new SmartContract();
-//                Toast.makeText(getApplicationContext(), "YAY", Toast.LENGTH_LONG).show();
-//                int balance = lottery.getBalance(address);
-//                boolean win = lottery.checkLottery(address);
-
-
             }
         }).start();
 
-
-//        ((TextView)findViewById(R.id.textView)).setText(balance);
-//        Toast.makeText(getApplicationContext(), win?"true":"false", Toast.LENGTH_LONG).show();
-//        Toast.makeText(getApplicationContext(), balance, Toast.LENGTH_LONG).show();
-
-        ///////////////////////////////////////////////////
 
         this.keywords = new ArrayList<>();
         this.keywords.addAll(Arrays.asList("cup", "glass", "water", "bottle"));
@@ -141,7 +153,18 @@ public class Home extends AppCompatActivity {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    dOut.close();
+                    dIn.close();
+                    clientSocket.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
                 startActivity(intent);
             }
         });
@@ -163,6 +186,8 @@ public class Home extends AppCompatActivity {
                     findViewById(R.id.balance).setVisibility(View.INVISIBLE);
                     findViewById(R.id.textView).setVisibility(View.INVISIBLE);
                     findViewById(R.id.button_logout).setVisibility(View.INVISIBLE);
+                    findViewById(R.id.win).setVisibility(View.INVISIBLE);
+                    findViewById(R.id.nowin).setVisibility(View.INVISIBLE);
                     check.firstTime = false;
                     return;
                 }
@@ -176,10 +201,16 @@ public class Home extends AppCompatActivity {
         /* END Buttons */
     }
 
-    public void thisIsTheServerJustTakeItPlease(){
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
+    }
+
+    public void thisIsTheServerJustTakeItPlease() {
 
         int port = 4444; // TODO
-        String ip = "bla"; // TODO - which one???
+        String ip = "";
 
 
         ServerSocket serverSocket = null;
@@ -294,6 +325,8 @@ public class Home extends AppCompatActivity {
                             findViewById(R.id.balance).setVisibility(View.VISIBLE);
                             findViewById(R.id.textView).setVisibility(View.VISIBLE);
                             findViewById(R.id.button_logout).setVisibility(View.VISIBLE);
+                            findViewById(R.id.win).setVisibility(View.INVISIBLE);
+                            findViewById(R.id.nowin).setVisibility(View.VISIBLE);
                         }
                     });
 
@@ -309,7 +342,24 @@ public class Home extends AppCompatActivity {
 
                 if (decision) { // if it is a bottle:
 
-                    /* TODO UPDATE THE BALANCE */
+                    try {
+
+
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                TextView balanceView = (TextView) findViewById(R.id.textView);
+                                int balance = Integer.parseInt(balanceView.getText().toString());
+                                balanceView.setText(String.valueOf(balance + 1));
+                            }
+                        });
+
+                     /* update balance */
+                        dOut.writeInt(3);
+                        dOut.flush();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (Exception e) {
