@@ -26,7 +26,11 @@ public class SmartContract {
     //Web3j web3 = Web3jFactory.build(new InfuraHttpService("https://ropsten.infura.io/yjAnYyZgUECNLVLUPpGK"));
 
     String address = "0x5ba28f28aa3113df222858ad69f9b618f2b5bcf0";
+<<<<<<< HEAD
+    String contractAddress = "0x43072c60bb645fe46bb86a447f9c27f14e9065f1";
+=======
     String contractAddress = "0xeaec33d0aac91b23459e2d2764daa9872c206bed";
+>>>>>>> da33c6d440fbef0ef9fbd5c1819b7d16f5723337
     String password = "12345678";
     String wallet = "./wallet.json";
     Credentials credentials = null;
