@@ -58,7 +58,7 @@ public class Home extends AppCompatActivity {
     private ArrayList<String> keywords;
     final private State check = new State();
 
-    public static final String subscriptionKey = "***REMOVED***";
+    public static final String subscriptionKey = "YourKey";
     public static final String uriBase = "https://westeurope.api.cognitive.microsoft.com/vision/v1.0/analyze";
     public static final String aux = "visualFeatures=Description&language=en";
 
