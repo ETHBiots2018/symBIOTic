@@ -30,6 +30,7 @@ public class Main {
 
         SmartContract lottery = new SmartContract();
 
+<<<<<<< HEAD
         thisIsTheServerJustTakeItPlease(address, lottery);
 
     }
@@ -89,6 +90,12 @@ int type = dIn.readInt();
         } catch (IOException e) {
             e.printStackTrace();
         }
+=======
+        System.out.println(lottery.checkLottery(address));
+        System.out.println(lottery.getBalance(address));
+        lottery.recycle(address);
+        System.out.println(lottery.getBalance(address));
+>>>>>>> da33c6d440fbef0ef9fbd5c1819b7d16f5723337
     }
 
     public void test(){
