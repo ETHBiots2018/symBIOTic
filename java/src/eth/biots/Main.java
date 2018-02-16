@@ -10,10 +10,14 @@ import org.web3j.protocol.infura.InfuraHttpService;
 import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -26,10 +30,65 @@ public class Main {
 
         SmartContract lottery = new SmartContract();
 
-        System.out.println(lottery.checkLottery(address));
-        System.out.println(lottery.getBalance(address));
-        lottery.recycle(address);
-        System.out.println(lottery.getBalance(address));
+        thisIsTheServerJustTakeItPlease(address, lottery);
+
+    }
+
+    public static void thisIsTheServerJustTakeItPlease(String address, SmartContract lottery){
+
+        int port = 4444; // TODO
+        String ip = "bla"; // TODO - which one???
+
+
+        ServerSocket serverSocket = null;
+
+        try {
+            serverSocket = new ServerSocket(port);
+
+            while (true) {
+                // client:
+                try {
+                    Socket socket = serverSocket.accept();
+
+                    DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+                    DataInputStream dIn = new DataInputStream(socket.getInputStream());
+                    boolean clientConnected = true;
+                    while (clientConnected) {
+System.out.println("connected");                        
+int type = dIn.readInt();
+                        switch (type) {
+                            case 1: // balance
+                                int balance = lottery.getBalance(address); // TODO Balance
+                                dOut.writeInt(balance);
+                                dOut.flush();
+                                break;
+                            case 2: // lottery
+                                boolean lottery_ = lottery.checkLottery(address); // TODO Lottery
+                                dOut.writeBoolean(lottery_);
+                                dOut.flush();
+                                break;
+                            case 3: // update
+                                // TODO Update balance
+				new Thread(new Runnable() {
+                                    public void run() {
+                                        lottery.recycle(address);
+                                    }
+                                }).start();    
+                            break;
+                            default:
+                                dOut.close();
+                                dIn.close();
+                                clientConnected = false;
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void test(){
@@ -56,12 +115,14 @@ public class Main {
         Credentials credentials = null;
         try {
             credentials = WalletUtils.loadCredentials(password, wallet);
+            System.out.print("test");
+            System.out.println(credentials.getAddress());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (CipherException e) {
             e.printStackTrace();
         }
-
+        credentials = null;
 //        create
 //        YourSmartContract contract = YourSmartContract.deploy(
 //                <web3j>, <credentials>,
@@ -107,7 +168,6 @@ public class Main {
                 e.printStackTrace();
             }
         }
-
 
         //interact with contract
         try {

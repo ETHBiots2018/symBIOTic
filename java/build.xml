@@ -1,0 +1,47 @@
+<project name="biots" default="jar" basedir=".">
+    <description>
+        ANT Build File for BIOTS
+    </description>
+    <!-- set global properties for this build -->
+
+    <property name="nethzid" value="isaca"/>
+
+    <property name="src" location="src"/>
+    <property name="build" location="build"/>
+    <property name="dist" location="dist"/>
+
+    <target name="init">
+        <tstamp/>
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="compile" depends="init" description="compile the source">
+        <!-- Compile the java code from ${src} into ${build} -->
+        <javac srcdir="${src}" destdir="${build}" includeantruntime="false">
+            <classpath>
+                <pathelement path="src/*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile" description="generate the distribution">
+        <!-- Create the distribution directory -->
+        <mkdir dir="${dist}"/>
+        <!-- Put everything in ${build} into the jar file -->
+        <jar jarfile="${dist}/biots.jar" basedir="${build}" compress="true">
+            <zipgroupfileset dir="lib" includes="*.jar" />
+            <fileset dir="${src}" includes="**/*.java"/>
+            <manifest>
+                <attribute name="Main-Class" value="eth.biots.Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean"
+            description="clean up">
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+    </target>
+</project>
+
