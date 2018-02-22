@@ -25,7 +25,7 @@ symBIOTic
 └───contracts                     (Smart Contracts for the lottery backend)
 │   │   ...
 │   
-└───java                          (Java helper libraries)
+└───java                          (Java helper libraries + Socket Server - bridge between the app and the blockchain)
 │   │   ...
 
 ```
